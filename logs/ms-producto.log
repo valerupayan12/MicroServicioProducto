@@ -41,3 +41,10 @@
 2026-05-22 18:57:04 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name userDetailsService
 2026-05-22 18:57:05 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8082 (http) with context path '/'
 2026-05-22 18:57:05 [main] INFO  c.e.M.MicroProductoApplication - Started MicroProductoApplication in 16.125 seconds (process running for 17.207)
+2026-05-22 18:58:20 [http-nio-8082-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-22 18:58:20 [http-nio-8082-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-05-22 18:58:20 [http-nio-8082-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2026-05-22 18:58:21 [http-nio-8082-exec-1] INFO  c.e.M.s.impl.ProductoServiceImpl - [ms-producto] Listando todos los productos
+2026-05-22 18:58:26 [http-nio-8082-exec-3] INFO  c.e.M.s.impl.ProductoServiceImpl - [ms-producto] Creando producto: Aceite de Oliva
+2026-05-22 18:58:27 [http-nio-8082-exec-3] INFO  c.e.M.s.impl.ProductoServiceImpl - [ms-producto] Producto creado id: 1
+2026-05-22 18:58:32 [http-nio-8082-exec-5] INFO  c.e.M.s.impl.ProductoServiceImpl - [ms-producto] Buscando producto id: 1
