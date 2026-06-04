@@ -2,6 +2,7 @@ package com.example.MicroProducto.service.impl;
 
 import com.example.MicroProducto.dto.ProductoDTO;
 import com.example.MicroProducto.entity.Producto;
+import com.example.MicroProducto.repository.CategoriaRepository;
 import com.example.MicroProducto.repository.ProductoRepository;
 import com.example.MicroProducto.service.ProductoService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final CategoriaRepository categoriaRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -66,6 +68,7 @@ public class ProductoServiceImpl implements ProductoService {
     public ProductoDTO.Response crear(ProductoDTO.Request request) {
         log.info("[ms-producto] Creando producto: {}", request.getNombre());
 
+        
         if (productoRepository.existsByNombreIgnoreCase(request.getNombre())) {
             throw new RuntimeException("Ya existe un producto con el nombre: " + request.getNombre());
         }
@@ -88,7 +91,10 @@ public class ProductoServiceImpl implements ProductoService {
         log.info("[ms-producto] Actualizando producto id: {}", id);
 
         Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
+                .orElseThrow(() -> {
+                    log.error("[ms-producto] Producto no encontrado id: {}", id);
+                    return new RuntimeException("Producto no encontrado con id: " + id);
+                });
 
         producto.setNombre(request.getNombre());
         producto.setDescripcion(request.getDescripcion());
@@ -96,7 +102,9 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setPrecio_base(request.getPrecio_base());
         producto.setEstado(request.isEstado());
 
-        return mapToResponse(productoRepository.save(producto));
+        Producto actualizado = productoRepository.save(producto);
+        log.info("[ms-producto] Producto actualizado id: {}", actualizado.getId());
+        return mapToResponse(actualizado);
     }
 
     @Override
@@ -111,7 +119,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     private ProductoDTO.Response mapToResponse(Producto p) {
         return new ProductoDTO.Response(
-                p.getId(),
+                (long) p.getId(),
                 p.getNombre(),
                 p.getDescripcion(),
                 p.getCategoria(),

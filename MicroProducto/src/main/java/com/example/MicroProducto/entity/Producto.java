@@ -15,7 +15,7 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @NotBlank(message = "El nombre es obligatorio")
     @Column(name = "nombre", nullable = false, length = 100)
@@ -26,7 +26,7 @@ public class Producto {
 
     @NotBlank(message = "La categoría es obligatoria")
     @Column(name = "categoria", nullable = false, length = 50)
-    private String categoria;
+    private Categoria categoria; //FK
 
     @Min(value = 0, message = "El precio base no puede ser negativo")
     @Column(name = "precio_base", nullable = false)
