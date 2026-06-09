@@ -15,18 +15,17 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @NotBlank(message = "El nombre es obligatorio")
+    private Long id;
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
     @Column(name = "descripcion", length = 255)
     private String descripcion;
 
-    @NotBlank(message = "La categoría es obligatoria")
-    @Column(name = "categoria", nullable = false, length = 50)
-    private Categoria categoria; //FK
+    @NotNull(message = "La categoría es obligatoria")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
 
     @Min(value = 0, message = "El precio base no puede ser negativo")
     @Column(name = "precio_base", nullable = false)

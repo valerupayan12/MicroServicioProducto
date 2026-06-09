@@ -3,10 +3,10 @@ package com.example.MicroProducto.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 
-import com.example.MicroProducto.dto.ProductoDTO;
+
 import com.example.MicroProducto.entity.Categoria;
 import com.example.MicroProducto.entity.Producto;
 import com.example.MicroProducto.service.CategoriaService;

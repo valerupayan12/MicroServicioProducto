@@ -1,6 +1,7 @@
 package com.example.MicroProducto.service.impl;
 
 import com.example.MicroProducto.dto.ProductoDTO;
+import com.example.MicroProducto.entity.Categoria;
 import com.example.MicroProducto.entity.Producto;
 import com.example.MicroProducto.repository.CategoriaRepository;
 import com.example.MicroProducto.repository.ProductoRepository;
@@ -35,7 +36,7 @@ public class ProductoServiceImpl implements ProductoService {
     @Transactional(readOnly = true)
     public List<ProductoDTO.Response> listarPorCategoria(String categoria) {
         log.info("[ms-producto] Listando productos por categoria: {}", categoria);
-        return productoRepository.findByCategoria(categoria)
+        return productoRepository.findByCategoria_Nombre(categoria)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -68,15 +69,17 @@ public class ProductoServiceImpl implements ProductoService {
     public ProductoDTO.Response crear(ProductoDTO.Request request) {
         log.info("[ms-producto] Creando producto: {}", request.getNombre());
 
-        
         if (productoRepository.existsByNombreIgnoreCase(request.getNombre())) {
             throw new RuntimeException("Ya existe un producto con el nombre: " + request.getNombre());
         }
 
+        Categoria categoria = categoriaRepository.findByNombre(request.getCategoria())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada: " + request.getCategoria()));
+
         Producto producto = new Producto();
         producto.setNombre(request.getNombre());
         producto.setDescripcion(request.getDescripcion());
-        producto.setCategoria(request.getCategoria());
+        producto.setCategoria(categoria);
         producto.setPrecio_base(request.getPrecio_base());
         producto.setEstado(request.isEstado());
 
@@ -96,9 +99,12 @@ public class ProductoServiceImpl implements ProductoService {
                     return new RuntimeException("Producto no encontrado con id: " + id);
                 });
 
+        Categoria categoria = categoriaRepository.findByNombre(request.getCategoria())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada: " + request.getCategoria()));
+
         producto.setNombre(request.getNombre());
         producto.setDescripcion(request.getDescripcion());
-        producto.setCategoria(request.getCategoria());
+        producto.setCategoria(categoria);
         producto.setPrecio_base(request.getPrecio_base());
         producto.setEstado(request.isEstado());
 
@@ -119,10 +125,10 @@ public class ProductoServiceImpl implements ProductoService {
 
     private ProductoDTO.Response mapToResponse(Producto p) {
         return new ProductoDTO.Response(
-                (long) p.getId(),
+                p.getId(),
                 p.getNombre(),
                 p.getDescripcion(),
-                p.getCategoria(),
+                p.getCategoria().getNombre(),
                 p.getPrecio_base(),
                 p.isEstado()
         );
