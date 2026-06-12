@@ -1,4 +1,5 @@
 {
+    "version": "0.2.0",
     "configurations": [
         {
             "type": "java",
@@ -8,7 +9,10 @@
             "mainClass": "com.example.MicroProducto.MicroProductoApplication",
             "projectName": "MicroProducto",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "local"
+            }
         }
     ]
 }
