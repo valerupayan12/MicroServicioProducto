@@ -2,14 +2,14 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_ROOT_PASSWORD: "root123"
       MYSQL_DATABASE: db_ecomarket
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin123
+      MYSQL_USER: "admin"
+      MYSQL_PASSWORD: "admin123"
     ports:
-      - "3306:3306"
+      - "3307:3306"   # host:contenedor → ahora usa 3307 en Windows
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1","-uroot","-proot123"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-protocol=123"]
       interval: 5s
       timeout: 5s
       retries: 10
