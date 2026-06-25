@@ -1,71 +1,111 @@
 package com.example.MicroProducto;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.List;
+import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.example.MicroProducto.dto.ProductoDTO;
+import com.example.MicroProducto.entity.Categoria;
 import com.example.MicroProducto.entity.Producto;
+import com.example.MicroProducto.repository.CategoriaRepository;
 import com.example.MicroProducto.repository.ProductoRepository;
-import com.example.MicroProducto.service.ProductoService;
+import com.example.MicroProducto.service.impl.ProductoServiceImpl;
 
+@ExtendWith(MockitoExtension.class)
 public class ProductoServiceTest {
 
-    @Autowired
-    private ProductoService productoService;
+    // Inyecta los mocks dentro de la implementacion real del servicio (sin levantar el contexto de Spring).
+    @InjectMocks
+    private ProductoServiceImpl productoService;
 
     @Mock
     private ProductoRepository productoRepository;
 
+    @Mock
+    private CategoriaRepository categoriaRepository;
+
+    private Producto producto;
+    private Categoria categoria;
+
+    @BeforeEach
+    public void setUp() {
+        categoria = new Categoria();
+        categoria.setId_categoria(1);
+        categoria.setNombre("Electrónica");
+        categoria.setDescripcion("Productos electrónicos");
+        categoria.setEstado(true);
+
+        producto = new Producto();
+        producto.setId(1L);
+        producto.setNombre("Producto 1");
+        producto.setDescripcion("Descripción del producto 1");
+        producto.setCategoria(categoria);
+        producto.setPrecio_base(100);
+        producto.setEstado(true);
+    }
+
     @Test
-    public void testFindAll() {
-        Producto producto = crearProducto();
+    public void testListarTodos() {
         when(productoRepository.findAll()).thenReturn(List.of(producto));
 
-        List<Producto> productos = productoService.findAll();
+        List<ProductoDTO.Response> productos = productoService.listarTodos();
+
         assertNotNull(productos);
         assertEquals(1, productos.size());
         assertEquals(producto.getId(), productos.get(0).getId());
     }
 
     @Test
-    public void testFindById() {
-        Integer id = 1;
-        Producto producto = crearProducto();
+    public void testBuscarPorId() {
+        Long id = 1L;
         when(productoRepository.findById(id)).thenReturn(Optional.of(producto));
 
-        Producto found = productoService.findById(id);
+        ProductoDTO.Response found = productoService.buscarPorId(id);
+
         assertNotNull(found);
         assertEquals(id, found.getId());
     }
 
     @Test
-    public void testSave() {
-        Producto producto = crearProducto();
-        when(productoRepository.save(producto)).thenReturn(producto);
+    public void testCrear() {
+        ProductoDTO.Request request = new ProductoDTO.Request(
+                "Producto 1",
+                "Descripción del producto 1",
+                "Electrónica",
+                100,
+                true
+        );
 
-        Producto saved = productoService.save(producto);
+        when(productoRepository.existsByNombreIgnoreCase("Producto 1")).thenReturn(false);
+        when(categoriaRepository.findByNombre("Electrónica")).thenReturn(Optional.of(categoria));
+        when(productoRepository.save(org.mockito.ArgumentMatchers.any(Producto.class))).thenReturn(producto);
+
+        ProductoDTO.Response saved = productoService.crear(request);
+
         assertNotNull(saved);
-        assertEquals(1, saved.getEstado());
+        assertEquals(true, saved.isEstado());
+        assertEquals("Producto 1", saved.getNombre());
     }
 
     @Test
-    public void testDeleteById() {
-        Integer id = 1;
-        doNothing().when(productoRepository).deleteById(id);
+    public void testEliminar() {
+        Long id = 1L;
+        when(productoRepository.existsById(id)).thenReturn(true);
 
-        productoService.deleteById(id);
+        productoService.eliminar(id);
+
         verify(productoRepository, times(1)).deleteById(id);
     }
-
-    private Producto crearProducto() {
-        Producto producto = new Producto();
-        producto.setId(1);
-        producto.setNombre("Producto 1");
-        producto.setDescripcion("Descripción del producto 1");
-        producto.setPrecio(100.0);
-        producto.setEstado(1);
-        return producto;
-    }
-}   
+}
