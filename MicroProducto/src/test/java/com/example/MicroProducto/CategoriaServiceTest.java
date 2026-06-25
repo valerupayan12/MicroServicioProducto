@@ -1,69 +1,100 @@
 package com.example.MicroProducto;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.example.MicroProducto.entity.Categoria;
 import com.example.MicroProducto.repository.CategoriaRepository;
-import com.example.MicroProducto.service.CategoriaService;
+import com.example.MicroProducto.service.impl.CategoriaServiceImpl;
 
-@SpringBootTest
-@ActiveProfiles("test")
-public class CategoriaServiceTest  {
+@ExtendWith(MockitoExtension.class)
+public class CategoriaServiceTest {
 
-    @Autowired
-    private CategoriaService categoriaService;
+    // Inyecta los mocks dentro de la implementación real del servicio (sin levantar el contexto de Spring).
+    @InjectMocks
+    private CategoriaServiceImpl categoriaService;
 
     @Mock
     private CategoriaRepository categoriaRepository;
 
+    private Categoria categoria;
+
+    @BeforeEach
+    public void setUp() {
+        categoria = crearCategoria();
+    }
+
     @Test
-    public void testFindAll() {
-        Categoria categoria = crearCategoria();
+    public void testGetCategorias() {
         when(categoriaRepository.findAll()).thenReturn(List.of(categoria));
 
-        List<Categoria> categorias = categoriaService.findAll();
+        List<Categoria> categorias = categoriaService.getCategorias();
+
         assertNotNull(categorias);
         assertEquals(1, categorias.size());
-        assertEquals(categoria.getId(), categorias.get(0).getId());
+        assertEquals(categoria.getId_categoria(), categorias.get(0).getId_categoria());
     }
 
     @Test
-    public void testFindById() {
-        Integer id = 1;
-        Categoria categoria = crearCategoria();
+    public void testGetCategoria() {
+        int id = 1;
         when(categoriaRepository.findById(id)).thenReturn(Optional.of(categoria));
 
-        Categoria found = categoriaService.findById(id);
+        Categoria found = categoriaService.getCategoria(id);
+
         assertNotNull(found);
-        assertEquals(id, found.getId());
+        assertEquals(id, found.getId_categoria());
     }
 
     @Test
-    public void testSave() {
-        Categoria categoria = crearCategoria();
+    public void testSaveCategoria() {
         when(categoriaRepository.save(categoria)).thenReturn(categoria);
 
-        Categoria saved = categoriaService.save(categoria);
+        Categoria saved = categoriaService.saveCategoria(categoria);
+
         assertNotNull(saved);
-        assertEquals(1, saved.getEstado());
+        assertEquals(true, saved.isEstado());
     }
 
     @Test
-    public void testDeleteById() {
-        Integer id = 1;
-        doNothing().when(categoriaRepository).deleteById(id);
+    public void testUpdateCategoria() {
+        when(categoriaRepository.save(categoria)).thenReturn(categoria);
 
-        categoria   Service.deleteById(id);
+        int resultado = categoriaService.updateCategoria(categoria);
+
+        assertEquals(1, resultado);
+        verify(categoriaRepository, times(1)).save(categoria);
+    }
+
+    @Test
+    public void testDeleteCategoria() {
+        int id = 1;
+
+        int resultado = categoriaService.deleteCategoria(id);
+
+        assertEquals(1, resultado);
         verify(categoriaRepository, times(1)).deleteById(id);
     }
 
     private Categoria crearCategoria() {
         Categoria categoria = new Categoria();
-        categoria.setId(1);
+        categoria.setId_categoria(1);
         categoria.setNombre("Test Categoria");
+        categoria.setDescripcion("Descripción de prueba");
+        categoria.setEstado(true);
         return categoria;
     }
 }
